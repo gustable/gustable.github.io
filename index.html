@@ -34,7 +34,49 @@
 			var camera, scene, renderer;
 			var controls;
 
-			var Element = function ( id, x, y, z, ry ) {
+			var Element1 = function ( id, x, y, z, ry ) {
+
+				var div = document.createElement( 'div' );
+				div.style.width = '480px';
+				div.style.height = '360px';
+				div.style.backgroundColor = '#000';
+
+				var iframe = document.createElement( 'iframe' );
+				iframe.style.width = '480px';
+				iframe.style.height = '360px';
+				iframe.style.border = '0px';
+				iframe.src = "https://fast.wistia.com/embed/medias/ll0g2umdiw";
+				div.appendChild( iframe );
+
+				var object = new THREE.CSS3DObject( div );
+				object.position.set( x, y, z );
+				object.rotation.y = ry;
+
+				return object;
+			};
+
+			var Element2 = function ( id, x, y, z, ry ) {
+
+				var div = document.createElement( 'div' );
+				div.style.width = '480px';
+				div.style.height = '360px';
+				div.style.backgroundColor = '#000';
+
+				var iframe = document.createElement( 'iframe' );
+				iframe.style.width = '480px';
+				iframe.style.height = '360px';
+				iframe.style.border = '0px';
+				iframe.src = "https://fast.wistia.com/embed/medias/tehav247ff";
+				div.appendChild( iframe );
+
+				var object = new THREE.CSS3DObject( div );
+				object.position.set( x, y, z );
+				object.rotation.y = ry;
+
+				return object;
+			};
+
+			var Element3 = function ( id, x, y, z, ry ) {
 
 				var div = document.createElement( 'div' );
 				div.style.width = '480px';
@@ -53,9 +95,32 @@
 				object.rotation.y = ry;
 
 				return object;
-
 			};
+			
 
+			var Element4 = function ( id, x, y, z, ry ) {
+
+				var div = document.createElement( 'div' );
+				div.style.width = '480px';
+				div.style.height = '360px';
+				div.style.backgroundColor = '#000';
+
+				var iframe = document.createElement( 'iframe' );
+				iframe.style.width = '480px';
+				iframe.style.height = '360px';
+				iframe.style.border = '0px';
+				iframe.src = "https://fast.wistia.com/embed/medias/jokj5lxf9r";
+				div.appendChild( iframe );
+
+				var object = new THREE.CSS3DObject( div );
+				object.position.set( x, y, z );
+				object.rotation.y = ry;
+
+				return object;
+			};
+			
+			
+			
 			init();
 			animate();
 
@@ -73,10 +138,10 @@
 				container.appendChild( renderer.domElement );
 
 				var group = new THREE.Group();
-				group.add( new Element( 'SJOz3qjfQXU', 0, 0, 240, 0 ) );
-				group.add( new Element( 'Y2-xZ-1HE-Q', 240, 0, 0, Math.PI / 2 ) );
-				group.add( new Element( 'IrydklNpcFI', 0, 0, - 240, Math.PI ) );
-				group.add( new Element( '9ubytEsCaS0', - 240, 0, 0, - Math.PI / 2 ) );
+				group.add( new Element1( '1', 0, 0, 240, 0 ) );
+				group.add( new Element2( '1', 240, 0, 0, Math.PI / 2 ) );
+				group.add( new Element3( '3', 0, 0, - 240, Math.PI ) );
+				group.add( new Element4( '4', - 240, 0, 0, - Math.PI / 2 ) );
 				scene.add( group );
 
 				controls = new THREE.TrackballControls( camera );
