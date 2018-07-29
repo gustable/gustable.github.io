@@ -48,6 +48,16 @@ var cubes = new Array();
         }
     }
 
+    function load() { 
+        var objLoader = new THREE.OBJLoader();
+        objLoader.setMaterials(null);
+        objLoader.setPath('docs/libraries/');
+        objLoader.load('frequency.obj', function (object) {
+        scene.add(object);
+        object.position.y -= 60;
+    });
+    
+    
     init();
     animate();
 
