@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebGL/CSS3D Demo</title>
+    <style>
+    body
+    {
+      background-color: #ffffff;
+      margin: 0;
+      overflow: hidden;
+    }
+    </style>
+</head>
+<body>
+
+    <script src="libraries/three.js"></script>
+    <script src="libraries/cannon.js"></script>
+    <script src="libraries/TrackballControls.js"></script>
+    <script src="libraries/Stats.js"></script>
+    <script src="libraries/dice.js"></script>
+    <script src="libraries/CSS3DRenderer.js"></script>
+
+<!-- Div which will hold the Output -->
+<!-- THIS DIV WILL NEED TO MATCH THAT BELOW-->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+var controls, camera, glScene, cssScene, glRenderer, cssRenderer, stats;
+
+// FUNCTIONS
+
+  // Creates WebGL Renderer
+  function createGlRenderer() {
+    var glRenderer = new THREE.WebGLRenderer( {antialias:true} );
+    glRenderer.setClearColor(new THREE.Color(0xeeeeee, 1.0));
+    glRenderer.setPixelRatio(window.devicePixelRatio);
+    glRenderer.setSize(window.innerWidth, window.innerHeight);
+    glRenderer.domElement.style.position = 'absolute';
+    glRenderer.domElement.style.zIndex = 0;
+    glRenderer.domElement.style.top = 0;
+    return glRenderer;
+  }
+
+  // Creates CSS Renderer
+  function createCssRenderer() {
+    var cssRenderer = new THREE.CSS3DRenderer();
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.domElement.style.position = 'absolute';
+    glRenderer.domElement.style.zIndex = 1;
+    cssRenderer.domElement.style.top = 0;
+    return cssRenderer;
+  }
+
+  function createCssObject(w, h, position, rotation, url) {
+
+    var html = [
+
+      '<div style="width:' + w + 'px; height:' + h + 'px;">',
+      '<iframe src="' + url + '" width="' + w + '" height="' + h + '">',
+      '</iframe>',
+      '</div>'
+
+    ].join('\n');
+
+    var div = document.createElement('div');
+
+    $(div).html(html);
+
+    var cssObject = new THREE.CSS3DObject(div);
+
+    cssObject.position.x = position.x;
+    cssObject.position.y = position.y;
+    cssObject.position.z = position.z;
+
+    cssObject.rotation.x = rotation.x;
+    cssObject.rotation.y = rotation.y;
+    cssObject.rotation.z = rotation.z;
+
+    return cssObject;
+  }
+
+  function create3dPage(w, h, position, rotation, url) {
+
+    var plane = createPlane(
+        w, h,
+        position,
+        rotation);
+
+    glScene.add(plane);
+
+    var cssObject = createCssObject(
+        w, h,
+        position,
+        rotation,
+        url);
+
+    cssScene.add(cssObject);
+  }
+
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // RENDERER
+        glRenderer = createGlRenderer();
+        cssRenderer = createCssRenderer();
+
+        //document.body.appendChild(glRenderer.domElement);
+
+        document.body.appendChild(cssRenderer.domElement);
+        cssRenderer.domElement.appendChild(glRenderer.domElement);
+
+        glScene = new THREE.Scene();
+        cssScene = new THREE.Scene();
+
+        // create the ground plane
+        var floorGeometry = new THREE.PlaneGeometry(60, 20);
+        var floorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+        var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.receiveShadow = true;
+
+        // rotate and position the plane
+        floor.rotation.x = -0.5 * Math.PI;
+        floor.position.x = 15;
+        floor.position.y = 0;
+        floor.position.z = 0;
+
+
+/*        // WEBPAGE
+        create3dPage(
+          100, 100,
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(0, 0, 0),
+          'http://adndevblog.typepad.com/cloud_and_mobile');
+*/
+        // add the plane to the scene
+        scene.add(floor);
+        glScene.add(floor);
+
+
+        // position and point the camera to the center of the scene
+        camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40, 60, -10);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        // add the output of the renderer to the html element
+        // CAN'T HAVE A DIV WITHIN A DIV
+        document.getElementById("WebGL-output").appendChild(glRenderer.domElement);
+
+        // call the render function
+        glRenderer.render(glScene, camera);
+    }
+    window.onload = init;
+
+
+</script>
+</body>
+</html>

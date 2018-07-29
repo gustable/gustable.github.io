@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+  	<title>WebGL/CSS3D Demo</title>
+    <script src="libraries/three.js"></script>
+    <script src="libraries/cannon.js"></script>
+    <script src="libraries/TrackballControls.js"></script>
+    <script src="libraries/Stats.js"></script>
+    <script src="libraries/dice.js"></script>
+    <script src="libraries/CSS3DRenderer.js"></script>
+  	<style>
+    body
+    {
+      background-color: #ffffff;
+      margin: 0;
+      overflow: hidden;
+    }
+ 	</style>
+</head>
+<body>
+<div id="WebGL Output"></div>
+
+<script type="text/javascript">
+
+var controls, camera, glScene, cssScene, glRenderer, cssRenderer, stats;
+
+// FUNCTIONS
+
+  // Creates WebGL Renderer
+  function createGlRenderer() {
+    var glRenderer = new THREE.WebGLRenderer( {antialias:true} );
+    glRenderer.setClearColor(new THREE.Color(0xeeeeee, 1.0));
+    glRenderer.setPixelRatio(window.devicePixelRatio);
+    glRenderer.setSize(window.innerWidth, window.innerHeight);
+    glRenderer.domElement.style.position = 'absolute';
+    glRenderer.domElement.style.zIndex = 0;
+    glRenderer.domElement.style.top = 0;
+    return glRenderer;
+  }
+
+  // Creates CSS Renderer
+  function createCssRenderer() {
+    var cssRenderer = new THREE.CSS3DRenderer();
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.domElement.style.position = 'absolute';
+    glRenderer.domElement.style.zIndex = 1;
+    cssRenderer.domElement.style.top = 0;
+    return cssRenderer;
+  }
+
+  function initialize() {
+	// SCENE
+    glScene = new THREE.Scene();
+    cssScene = new THREE.Scene();
+    controls = new THREE.TrackballControls(camera);
+    
+    // RENDERER
+    glRenderer = createGlRenderer();
+    cssRenderer = createCssRenderer();
+
+	// LIGHT
+    var ambientLight = new THREE.AmbientLight(0xffffff);
+    glScene.add(ambientLight);
+
+	// FLOOR
+	var floorGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
+	var floorMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.x = 15;
+	floor.position.y = 0;
+	floor.rotation.x = -0.5 * Math.PI;
+	glScene.add(floor);
+	cssScene.add(floor);
+
+	// WEBPAGE
+/*    create3dPage(
+      1000, 1000,
+      new THREE.Vector3(1050, 0, 400),
+      new THREE.Vector3(0, -45 * Math.PI / 180, 0),
+      'https://www.github.com');
+*/
+
+	// CAMERA
+    camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      1,
+      10000);
+
+    camera.position.set(-30, 40, 30);
+    camera.lookAt(glScene.position);
+
+    update();
+
+    //KEY ELEMENT
+    document.body.appendChild(cssRenderer.domElement);
+    cssRenderer.domElement.appendChild(glRenderer.domElement);
+    
+    //$(#"WebGL Output").append(glRenderer.domElement);
+    glRenderer.render(glScene, camera);
+    cssRenderer.render(cssScene, camera);
+
+  }
+
+  // Creates CSS object
+/*  function createCssObject(w, h, position, rotation, url) {
+
+    var html = [
+
+      '<div style="width:' + w + 'px; height:' + h + 'px;">',
+      '<iframe src="' + url + '" width="' + w + '" height="' + h + '">',
+      '</iframe>',
+      '</div>'
+
+    ].join('\n');
+
+    var div = document.createElement('div');
+
+    $(div).html(html);
+
+    var cssObject = new THREE.CSS3DObject(div);
+
+    cssObject.position.x = position.x;
+    cssObject.position.y = position.y;
+    cssObject.position.z = position.z;
+
+    cssObject.rotation.x = rotation.x;
+    cssObject.rotation.y = rotation.y;
+    cssObject.rotation.z = rotation.z;
+
+    return cssObject;
+  }
+*/
+
+  // Creates 3d webpage object
+/*  function create3dPage(w, h, position, rotation, url){
+    var plane = createPlane(
+        w, h,
+        position,
+        rotation);
+    glScene.add(plane);
+    var cssObject = createCssObject(
+        w, h,
+        position,
+        rotation,
+        url);
+    cssScene.add(cssObject);
+  }
+
+  function animate()
+  {
+    requestAnimationFrame( animate );
+	update();
+  }
+
+  function update()
+  {
+    controls.update();
+    Stats.update();
+    glRenderer.render(glScene, camera);
+    cssRenderer.render(cssScene, camera);
+  }  
+*/
+
+$(document ).ready(function() 
+  {
+    initialize();
+  });
+
+//init();
+//animate();
+
+</script>
+</body>
+</html>

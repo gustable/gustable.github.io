@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>WebGL/CSS3D Renderer Combo Demo</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+
+<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="libraries/three.min.js"></script>
+<script src="libraries/TrackballControls.js"></script>
+<script src="libraries/CSS3DRenderer.js"></script>
+<script src="https://fast.wistia.net/assets/external/E-v1.js" async></script>
+
+
+
+<script>
+  ///////////////////////////////////////////////////////////////////
+  // Thanks for Everything Mr. Doob!
+  // From CSS3DRenderer Demo By Philippe Leefsma, July 2015
+  // From dice by byWulf.
+  // From Cannon by Schteppe.
+  ///////////////////////////////////////////////////////////////////
+
+  var controls, camera, glScene, cssScene, glRenderer, cssRenderer;
+  var container, scene, renderer, stats, world, dice = [];
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates WebGL Renderer
+  //
+  ///////////////////////////////////////////////////////////////////
+  function createGlRenderer() {
+    var glRenderer = new THREE.WebGLRenderer({alpha:true});
+    glRenderer.setClearColor(0xECF8FF);
+    glRenderer.setPixelRatio(window.devicePixelRatio);
+    glRenderer.setSize(window.innerWidth, window.innerHeight);
+    glRenderer.domElement.style.position = 'absolute';
+    glRenderer.domElement.style.zIndex = 1;
+    glRenderer.domElement.style.top = 0;
+    return glRenderer;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates CSS Renderer
+  //
+  ///////////////////////////////////////////////////////////////////
+  function createCssRenderer() {
+    var cssRenderer = new THREE.CSS3DRenderer();
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.domElement.style.position = 'absolute';
+    glRenderer.domElement.style.zIndex = 0;
+    cssRenderer.domElement.style.top = 0;
+    return cssRenderer;
+  }
+  
+  ///////////////////
+  // Creates Dice
+  ///////////////////
+  function createDice() {
+    DiceManager.setWorld(world);
+    var colors = ['#becec2', '#becec2', '#becec2', '#becec2', '#becec2'];
+    for (var i = 0; i < 1; i++) {
+        var die = new DiceD12({size: 1.75, backColor: colors[i]});
+        scene.add(die.getObject());
+        dice.push(die);
+    }
+
+  //////////////////
+  // Create Floor
+  //////////////////
+  function createFloor() {
+    var floorMaterial = new THREE.MeshPhongMaterial( { color: '#09591d', side: THREE.DoubleSide } );
+    var floorGeometry = new THREE.PlaneGeometry( 300, 300, 10, 10 );
+    var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+    floor.receiveShadow  = true;
+    floor.rotation.x = Math.PI / 2;
+    scene.add(floor);
+  }
+
+  ///////////////////
+  // Creates World
+  ///////////////////
+  function createWorld() {
+    world = new CANNON.World();
+    world.gravity.set(0, -9.81 * 20, 0);
+    world.broadphase = new CANNON.NaiveBroadphase();
+    world.solver.iterations = 16;
+
+    //Floor
+    let floorBody = new CANNON.Body({mass: 0, shape: new CANNON.Plane(), material: DiceManager.floorBodyMaterial});
+    floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+    world.add(floorBody);
+    return world;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates plane mesh
+  //
+  ///////////////////////////////////////////////////////////////////
+  function createPlane(w, h, position, rotation) {
+    var material = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      opacity: 0.0,
+      side: THREE.DoubleSide
+    });
+    var geometry = new THREE.PlaneGeometry(w, h);
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = position.x;
+    mesh.position.y = position.y;
+    mesh.position.z = position.z;
+    mesh.rotation.x = rotation.x;
+    mesh.rotation.y = rotation.y;
+    mesh.rotation.z = rotation.z;
+    return mesh;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates CSS object
+  ///////////////////////////////////////////////////////////////////
+  function createCssObject(w, h, position, rotation, url) {
+    var html = "http://fast.wistia.com/embed/medias/jokj5lxf9r";
+    //var html = [
+    //  '<div style="width:' + w + 'px; height:' + h + 'px;">',
+    //  '<iframe src="' + url + '" width="' + w + '" height="' + h + '">',
+    //  '</iframe>',
+    //  '</div>'
+    //].join('\n');
+    var div = document.createElement('div');
+    $(div).html(html);
+    var cssObject = new THREE.CSS3DObject(div);
+    cssObject.position.x = position.x;
+    cssObject.position.y = position.y;
+    cssObject.position.z = position.z;
+    cssObject.rotation.x = rotation.x;
+    cssObject.rotation.y = rotation.y;
+    cssObject.rotation.z = rotation.z;
+    return cssObject;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates 3d webpage object
+  ///////////////////////////////////////////////////////////////////
+  function create3dPage(w, h, position, rotation, url) {
+    var plane = createPlane(
+        w, h,
+        position,
+        rotation);
+    glScene.add(plane);
+    var cssObject = createCssObject(
+        w, h,
+        position,
+        rotation,
+        url);
+    cssScene.add(cssObject);
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates material with random color
+  ///////////////////////////////////////////////////////////////////
+  function createColoredMaterial() {
+    var material = new THREE.MeshBasicMaterial({
+      color: Math.floor(Math.random() * 16777215),
+      shading: THREE.FlatShading,
+      side: THREE.DoubleSide
+    });
+    return material;
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Creates iframe web page
+  ///////////////////////////////////////////////////////////////////
+  var Element = function ( id, x, y, z, ry ) {
+
+    var div = document.createElement( 'div' );
+    div.style.width = '64px';
+    div.style.height = '64px';
+    div.style.backgroundColor = '#000';
+
+    var iframe = document.createElement( 'iframe' );
+    iframe.style.width = '64px';
+    iframe.style.height = '64px';
+    iframe.style.border = '0px';
+    iframe.src = "http://fast.wistia.com/embed/medias/jokj5lxf9r";
+    div.appendChild( iframe );
+
+    var dieFace = new THREE.CSS3DObject( div );
+    dieFace.position.set( x, y, z );
+    dieFace.rotation.y = ry;
+
+    return dieFace;
+
+  }
+  
+  ///////////////////////////////////////////////////////////////////
+  // Initializes scene
+  ///////////////////////////////////////////////////////////////////
+  function initialize() {
+    camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      1,
+      10000);
+    camera.position.set(0, 100, 3000);
+    controls = new THREE.TrackballControls(camera);
+    glRenderer = createGlRenderer();
+    cssRenderer = createCssRenderer();
+    //document.body.appendChild(glRenderer.domElement);
+    document.body.appendChild(cssRenderer.domElement);
+    cssRenderer.domElement.appendChild(glRenderer.domElement);
+    glScene = new THREE.Scene();
+    cssScene = new THREE.Scene();
+    var ambientLight = new THREE.AmbientLight(0x555555);
+    glScene.add(ambientLight);
+    var directionalLight = new THREE.DirectionalLight(0xffffff);
+    directionalLight.position.set( -.5, .5, -1.5 ).normalize();
+    glScene.add(directionalLight);
+    createDice();
+    createFloor();
+    createWorld();
+    createCssObject();
+    //var faceTexture = new dice.createTextTexture('.', '#becec2', '#becec2');
+    let faceTexture = cssObject;
+    update();
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // Updates scene
+  ///////////////////////////////////////////////////////////////////
+  function update() {
+    controls.update();
+    glRenderer.render(glScene, camera);
+    cssRenderer.render(cssScene, camera);
+    requestAnimationFrame(update);
+  }
+
+  ///////////////////////////////////////////////////////////////////
+  // On document ready
+  ///////////////////////////////////////////////////////////////////
+  $(document ).ready(function() {
+    initialize();
+  });
+
+
+
+</script>
+</body>
+</html>
