@@ -44,10 +44,12 @@ function vertY(){
     });
 
     // create an AudioAnalyser, passing in the sound and desired fftSize
-    var analyser = new THREE.AudioAnalyser( sound, 32 );
+    var analyser = new THREE.AudioAnalyser( sound, 2048 );
 
     // get the average frequency of the sound
     var data = analyser.getAverageFrequency();
+   
+    console.log(data);
 
     return data;
 }
@@ -64,10 +66,6 @@ function setRect(n){
         rect.translateZ(n * 2.5);
 
         scene.add(rect);
-        
-        console.log(n);
-        console.log(scene.children);
-
 }
 
 
