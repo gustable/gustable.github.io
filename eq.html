@@ -115,14 +115,14 @@ renderer.render(scene, camera);
 frameLooper();
 
 function frameLooper() {
-	WebGLRenderer.autoClear = false;
-    WebGLRenderer.clear();
+	renderer.autoClear = false;
+    renderer.clear();
     var l;
     for(l=0; l<10; l++) {
         freqData(l, analysisCtx);
         setRect(l);
     }
-    window.requestAnimationFrame( frameLooper );
+    requestAnimationFrame( frameLooper );
     controls.update();
     renderer.render( scene, camera );
 }
