@@ -115,8 +115,8 @@ renderer.render(scene, camera);
 frameLooper();
 
 function frameLooper() {
-	renderer.autoClear = false;
-    renderer.clear();
+	WebGLRenderer.autoClear = false;
+    WebGLRenderer.clear();
     var l;
     for(l=0; l<10; l++) {
         freqData(l, analysisCtx);
