@@ -62,8 +62,6 @@ function audioElement(){
     var dataArray = new Uint8Array(bufferLength);
     
     var freqData = analyser.getByteFrequencyData(dataArray);
-
-    console.log(dataArray);
 }
 
 /*
@@ -113,7 +111,7 @@ function init() {
     listener = new THREE.AudioListener();
     camera.add( listener );
 
-audioElement();
+    audioElement();
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -141,7 +139,7 @@ renderer.render(scene, camera);
 animate();
 
 function animate() {
-    freqData = dataArray;
+    //freqData = dataArray;
     console.log(freqData);
     requestAnimationFrame( animate );
     controls.update();
