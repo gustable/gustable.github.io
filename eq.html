@@ -41,14 +41,15 @@ function vertY(){
         sound.setLoop(true);
         sound.setVolume(2);
         sound.play();
-});
+    });
 
-// create an AudioAnalyser, passing in the sound and desired fftSize
-var analyser = new THREE.AudioAnalyser( sound, 32 );
+    // create an AudioAnalyser, passing in the sound and desired fftSize
+    var analyser = new THREE.AudioAnalyser( sound, 32 );
 
-// get the average frequency of the sound
-var data = analyser.getAverageFrequency();
+    // get the average frequency of the sound
+    var data = analyser.getAverageFrequency();
 
+    return data;
 }
 
 
