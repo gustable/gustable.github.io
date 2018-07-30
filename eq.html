@@ -114,10 +114,10 @@ renderer.render(scene, camera);
 animate();
 
 function animate() {
-    var i;
-        for(i=0; i<10; i++) {
-        freqData(i, analysisCtx);
-        setRect(i);
+    var l;
+    for(l=0; l<10; l++) {
+        freqData(l, analysisCtx);
+        setRect(l);
     }
     requestAnimationFrame( animate );
     controls.update();
