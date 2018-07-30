@@ -9,6 +9,10 @@
             margin: 0;
             overflow: hidden;
         }
+        div#mp3_player{ width:500px; height:60px; background:#000; padding:5px; margin:50px auto; }
+        div#mp3_player > div > audio{  width:500px; background:#000; float:left;  }
+        div#mp3_player > canvas{ width:500px; height:30px; background:#002D3C; float:left; }
+        div#container > canvas{ width:800px; height:600px; background:#ffffff; float:left; }
     </style>
 </head>
 
@@ -17,7 +21,9 @@
     <script src="docs/libraries/OrbitControls.js"></script>
     <script src="docs/libraries/stats.js"></script>
 
-    <div id="container"></div>
+    <div id="container">
+    <div id="mp3_player">
+    <div id="audio_box">
     </div>
 
 
@@ -27,9 +33,39 @@
 var camera, scene, renderer;
 var controls;
 var listener;
+var document;
+var audio = new Audio();
+
+// Establish all variables that your Analyser will use
+var source, context, analyser, dataArray;
 
 scene = new THREE.Scene();
 
+function audioElement(){
+    // Create a new instance of an audio object and adjust some of its properties
+    audio.src = "docs/00 - Cut Your Hair.mp3";
+    audio.controls = true;
+    audio.loop = true;
+    audio.autoplay = true;
+
+    context = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = context.createAnalyser(); // AnalyserNode method
+    analyser.fftSize = 32;
+
+    // Re-route audio playback into the processing graph of the AudioContext
+    source = context.createMediaElementSource(audio); 
+    source.connect(analyser);
+    analyser.connect(context.destination);
+
+    var bufferLength = analyser.frequencyBinCount;
+    var dataArray = new Uint8Array(bufferLength);
+    
+    var freqData = analyser.getByteFrequencyData(dataArray);
+
+    console.log(dataArray);
+}
+
+/*
 function vertY(){
     // create an Audio source
     var sound = new THREE.Audio( listener );
@@ -39,12 +75,12 @@ function vertY(){
     audioLoader.load( "docs/00 - Cut Your Hair.mp3", function( buffer ) {
         sound.setBuffer( buffer );
         sound.setLoop(true);
-        sound.setVolume(2);
+        sound.setVolume(0.5);
         sound.play();
     });
 
     // create an AudioAnalyser, passing in the sound and desired fftSize
-    var analyser = new THREE.AudioAnalyser( sound, 2048 );
+    var analyser = new THREE.AudioAnalyser( sound, 32 );
 
     // get the average frequency of the sound
     var data = analyser.getAverageFrequency();
@@ -53,10 +89,10 @@ function vertY(){
 
     return data;
 }
-
+*/
 
 function setRect(n){    
-        var geometry = new THREE.CubeGeometry(1, vertY*100, 1);
+        var geometry = new THREE.CubeGeometry(1, audioElement*1, 1);
         var material = new THREE.MeshBasicMaterial({
             color: 0x7777f});
         var rect = new THREE.Mesh(geometry, material);
@@ -68,9 +104,7 @@ function setRect(n){
         scene.add(rect);
 }
 
-
 function init() {
-
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
     camera.position.set( 50, 50, 50 );
     
@@ -78,7 +112,7 @@ function init() {
     listener = new THREE.AudioListener();
     camera.add( listener );
 
-vertY();
+audioElement();
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -98,7 +132,7 @@ vertY();
 
     controls = new THREE.OrbitControls(camera);
     controls.rotateSpeed = 4;
-};
+}
 
 init();
 controls.update();
@@ -106,13 +140,19 @@ renderer.render(scene, camera);
 animate();
 
 function animate() {
+    freqData = dataArray;
+    console.log(freqData);
     requestAnimationFrame( animate );
     controls.update();
     renderer.render( scene, camera );
 }
 
+document.getElementById('audio_box').appendChild(audio);
 document.getElementById("container").appendChild(renderer.domElement);
 
+
 </script>
+
+</div>
 </body>
 </html>
