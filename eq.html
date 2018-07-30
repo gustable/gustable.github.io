@@ -56,7 +56,7 @@ function vertY(){
 
 
 function setRect(n){    
-        var geometry = new THREE.CubeGeometry(1, vertY, 1);
+        var geometry = new THREE.CubeGeometry(1, vertY*100, 1);
         var material = new THREE.MeshBasicMaterial({
             color: 0x7777f});
         var rect = new THREE.Mesh(geometry, material);
