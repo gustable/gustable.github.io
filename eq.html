@@ -37,7 +37,7 @@ var document;
 var audio = new Audio();
 
 // Establish all variables that your Analyser will use
-var source, context, analyser, dataArray;
+var source, context, analyser, dataArray, bufferLength;
 
 scene = new THREE.Scene();
 
@@ -59,45 +59,16 @@ function audioElement(){
     analyser.connect(context.destination);
 
     var bufferLength = analyser.frequencyBinCount;
+    console.log(bufferLength*10);
     var dataArray = new Uint8Array(bufferLength);
-    
-    var freqData = analyser.getByteFrequencyData(dataArray);
 }
-
-/*
-function vertY(){
-    // create an Audio source
-    var sound = new THREE.Audio( listener );
-
-    // load a sound and set it as the Audio object's buffer
-    var audioLoader = new THREE.AudioLoader();
-    audioLoader.load( "docs/00 - Cut Your Hair.mp3", function( buffer ) {
-        sound.setBuffer( buffer );
-        sound.setLoop(true);
-        sound.setVolume(0.5);
-        sound.play();
-    });
-
-    // create an AudioAnalyser, passing in the sound and desired fftSize
-    var analyser = new THREE.AudioAnalyser( sound, 32 );
-
-    // get the average frequency of the sound
-    var data = analyser.getAverageFrequency();
-   
-    console.log(data);
-
-    return data;
-}
-*/
 
 function setRect(n){    
-        var geometry = new THREE.CubeGeometry(1, audioElement*1, 1);
+        var geometry = new THREE.CubeGeometry(1, bufferLength*10, 1);
         var material = new THREE.MeshBasicMaterial({
             color: 0x7777f});
         var rect = new THREE.Mesh(geometry, material);
         rect.name = "rect-" + scene.children.length;
-
-        //rect.position.z = -( 0 + (n*2) );    
         rect.translateZ(n * 2.5);
 
         scene.add(rect);
@@ -139,8 +110,6 @@ renderer.render(scene, camera);
 animate();
 
 function animate() {
-    //freqData = dataArray;
-    console.log(freqData[0]);
     requestAnimationFrame( animate );
     controls.update();
     renderer.render( scene, camera );
