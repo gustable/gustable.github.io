@@ -3,80 +3,90 @@
 <head>
     <meta charset="utf-8" />
     <title>three.js Graphic EQ</title>
-    <script type="text/javascript" src="docs/libraries/three.js"></script>
-    <script src="docs/libraries/TrackballControls.js"></script>
-    <script src="docs/libraries/CSS3DRenderer.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
 <body>
+    <script src="docs/libraries/three.js"></script>
+    <script src="docs/libraries/OrbitControls.js"></script>
+    <script src="docs/libraries/stats.js"></script>
 
     <div id="container"></div>
+    </div>
 
-<script>
+
+<script type="text/javascript">
 /*** base Graphic EQ code by srchea  */
 
-var camera, renderer;
+var camera, scene, renderer;
 var controls;
 
-var scene = new THREE.Scene();
-var cubes = new Array();
+scene = new THREE.Scene();
+
+function vertY(audioInput){}
 
 
-    function sticks() {
-        var i = 0;
-        for(var x = 0; x < 10; x += 1) {
-            var j = 0;
-            cubes[i] = new Array();
-            for(var y = 0; y < 10; y += 1) {
-                var geometry = new THREE.CubeGeometry(1, 1, 1);
+function setRect(n){    
+        var geometry = new THREE.CubeGeometry(1, vertY, 1);
+        var material = new THREE.MeshBasicMaterial({
+            color: 0x7777f});
+        var rect = new THREE.Mesh(geometry, material);
+        rect.name = "rect-" + scene.children.length;
 
-                var material = new THREE.MeshPhongMaterial({
-                color: randomFairColor(),
-                ambient: 0xbecece,
-                specular: 0xffffff,
-                shininess: 20,
-                reflectivity: 8
-                });
+        //rect.position.z = -( 0 + (n*2) );    
+        rect.translateZ(n * 2.5);
 
-                cubes[i][j] = new THREE.Mesh(geometry, material);
-                cubes[i][j].position = new THREE.Vector3(x, y, 0);
+        scene.add(rect);
+        
+        console.log(n);
+        console.log(scene.children);
 
-                scene.add(cubes[i][j]);
-                j++;
-            }
-            i++;
-        }
+}
+
+
+function init() {
+
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+    camera.position.set( 50, 50, 50 );
+           
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    // show cubes in an array
+    var i;
+    for(i=0; i<10; i++) {
+        setRect(i);
     }
 
-    init();
-    animate();
+    // show axes in the screen
+    var axes = new THREE.AxesHelper(2);
+    scene.add(axes);
 
-    function init() {
-        var container = document.getElementById( 'container' );
-        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window
-            innerHeight, 1, 5000 );
-        camera.position.set( 500, 350, 750 );
-                scene = new THREE.Scene();
-                renderer = new THREE.CSS3DRenderer();
-                renderer.setSize( window.innerWidth, window.innerHeight );
-                container.appendChild( renderer.domElement );
-                sticks();
-                controls = new THREE.TrackballControls( camera );
-                controls.rotateSpeed = 4;
-                window.addEventListener( 'resize', onWindowResize, false );
-            }
+    var ambientLight = new THREE.AmbientLight(0x7777ff);
+    scene.add(ambientLight);
 
-    function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-    }
-            
-    function animate() {
-        requestAnimationFrame( animate );
-        controls.update();
-        renderer.render( scene, camera );
-    }
+    controls = new THREE.OrbitControls(camera);
+    controls.rotateSpeed = 4;
+};
+
+init();
+controls.update();
+renderer.render(scene, camera);
+animate();
+
+function animate() {
+    requestAnimationFrame( animate );
+    controls.update();
+    renderer.render( scene, camera );
+}
+
+document.getElementById("container").appendChild(renderer.domElement);
 
 </script>
 </body>
