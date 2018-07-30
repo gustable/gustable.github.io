@@ -63,20 +63,20 @@ function audioElement(){
 function freqData(m, analysisCtx){
     var bufferLength = analysisCtx.frequencyBinCount;
     var dataArray = new Uint8Array(bufferLength);
-    analyser.getByteTimeDomainData(dataArray);
+    analyser.getByteFrequencyData(dataArray);
     var v = dataArray[m];
     console.log(v*0.1);
     return v;
 }
 
 function setRect(n){    
-        var geometry = new THREE.CubeGeometry(1, freqData(n, analysisCtx)*0.1, 1);
-        var material = new THREE.MeshBasicMaterial({
-            color: 0x7777f});
-        var rect = new THREE.Mesh(geometry, material);
-        rect.name = "rect-" + scene.children.length;
-        rect.translateZ(n * 2.5);
-        scene.add(rect);
+    var geometry = new THREE.CubeGeometry(1, freqData(n, analysisCtx)*0.1, 1);
+    var material = new THREE.MeshBasicMaterial({
+        color: 0x7777f});
+    var rect = new THREE.Mesh(geometry, material);
+    rect.name = "rect-" + scene.children.length;
+    rect.translateZ(n * 2.5);
+    scene.add(rect);
 }
 
 function init() {
@@ -115,6 +115,8 @@ renderer.render(scene, camera);
 frameLooper();
 
 function frameLooper() {
+	renderer.autoClear = false;
+    renderer.clear();
     var l;
     for(l=0; l<10; l++) {
         freqData(l, analysisCtx);
