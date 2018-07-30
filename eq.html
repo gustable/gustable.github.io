@@ -9,9 +9,9 @@
             margin: 0;
             overflow: hidden;
         }
-        div#mp3_player{ width:500px; height:60px; background:#000; padding:5px; margin:50px auto; }
-        div#mp3_player > div > audio{  width:500px; background:#000; float:left;  }
-        div#mp3_player > canvas{ width:500px; height:30px; background:#002D3C; float:left; }
+        div#mp3_player{ width:500px; height:10px; background:#ffffff; padding:5px; margin:5px auto; }
+        div#mp3_player > div > audio{  width:500px; background:#ffffff; float:left;  }
+        div#mp3_player > canvas{ width:500px; height:30px; background:#ffffff; float:left; }
         div#container > canvas{ width:800px; height:600px; background:#ffffff; float:left; }
     </style>
 </head>
@@ -43,7 +43,8 @@ scene = new THREE.Scene();
 
 function audioElement(){
     // Create a new instance of an audio object and adjust some of its properties
-    audio.src = "docs/00 - Cut Your Hair.mp3";
+    audio.src = "file:///home/tagp/gustable.github.io/docs/CutYourHair.mp3";
+    //audio.src = "docs/CutYourHair.mp3";
     audio.controls = true;
     audio.loop = true;
     audio.autoplay = true;
@@ -62,7 +63,7 @@ function audioElement(){
     
     var freqData = analyser.getByteFrequencyData(dataArray);
 
-    console.log(dataArray);
+    console.log(freqData);
 }
 
 /*
@@ -92,7 +93,7 @@ function vertY(){
 */
 
 function setRect(n){    
-        var geometry = new THREE.CubeGeometry(1, audioElement*1, 1);
+        var geometry = new THREE.CubeGeometry(1, (audioElement.freqData)*1, 1);
         var material = new THREE.MeshBasicMaterial({
             color: 0x7777f});
         var rect = new THREE.Mesh(geometry, material);
