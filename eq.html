@@ -112,15 +112,15 @@ function init() {
 init();
 controls.update();
 renderer.render(scene, camera);
-animate();
+frameLooper();
 
-function animate() {
+function frameLooper() {
     var l;
     for(l=0; l<10; l++) {
         freqData(l, analysisCtx);
         setRect(l);
     }
-    requestAnimationFrame( animate );
+    window.requestAnimationFrame( frameLooper );
     controls.update();
     renderer.render( scene, camera );
 }
