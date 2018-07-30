@@ -26,10 +26,30 @@
 
 var camera, scene, renderer;
 var controls;
+var listener;
 
 scene = new THREE.Scene();
 
-function vertY(audioInput){}
+function vertY(){
+    // create an Audio source
+    var sound = new THREE.Audio( listener );
+
+    // load a sound and set it as the Audio object's buffer
+    var audioLoader = new THREE.AudioLoader();
+    audioLoader.load( "docs/00 - Cut Your Hair.mp3", function( buffer ) {
+        sound.setBuffer( buffer );
+        sound.setLoop(true);
+        sound.setVolume(2);
+        sound.play();
+});
+
+// create an AudioAnalyser, passing in the sound and desired fftSize
+var analyser = new THREE.AudioAnalyser( sound, 32 );
+
+// get the average frequency of the sound
+var data = analyser.getAverageFrequency();
+
+}
 
 
 function setRect(n){    
@@ -54,7 +74,13 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
     camera.position.set( 50, 50, 50 );
-           
+    
+    // create an AudioListener and add it to the camera
+    listener = new THREE.AudioListener();
+    camera.add( listener );
+
+vertY();
+
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
 
