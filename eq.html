@@ -70,7 +70,7 @@ function freqData(m, analysisCtx){
 }
 
 function setRect(n){    
-    var geometry = new THREE.CubeGeometry(10, -(freqData(n, analysisCtx)*0.1), 10);
+    var geometry = new THREE.CubeGeometry(10, -(freqData(n, 1**-(analysisCtx))*0.1), 10);
     var material = new THREE.MeshBasicMaterial({
         color: 0x7777ff});
     var rect = new THREE.Mesh(geometry, material);
