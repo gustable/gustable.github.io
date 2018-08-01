@@ -43,7 +43,6 @@ scene = new THREE.Scene();
 
 function audioElement(){
     // Create a new instance of an audio object and adjust some of its properties
-    //audio.src = "file:///home/tagp/gustable.github.io/docs/CutYourHair.mp3";
     audio.src = "docs/00 - Cut Your Hair.mp3";
     audio.controls = true;
     audio.loop = true;
@@ -67,6 +66,16 @@ function freqData(m, analysisCtx){
     var v = dataArray[m];
     console.log(v*0.1);
     return v;
+}
+
+function clearScene(scene) {
+    for (let i = scene.children.length - 1; i >= 0; i--) {
+      const object = scene.children[i];
+      if (object.type === 'Mesh') {
+        object.geometry.dispose();
+        object.material.dispose();
+        scene.remove(object);}
+    }
 }
 
 function setRect(n){    
@@ -93,9 +102,9 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     // show cubes in an array
-    var i;
-    for(i=0; i<10; i++) {
-        setRect(i, analysisCtx);
+    var j;
+    for(j=0; j<10; j++) {
+        setRect(j, analysisCtx);
     }
 
     // show axes in the screen
@@ -116,7 +125,7 @@ frameLooper();
 
 function frameLooper() {
 	renderer.autoClear = false;
-    renderer.clear();
+    clearScene(scene);
     var l;
     for(l=0; l<10; l++) {
         freqData(l, analysisCtx);
