@@ -81,14 +81,26 @@ function setRect(n){
 function clearScene(scene) {
     var i;
     for (i = scene.children.length - 1; i >= 0; i--) {
-      var object = scene.children[i];
-      console.log(object);
-      if (object.type === 'Mesh') {
-        object.geometry.dispose();
-        object.material.dispose();
-        scene.remove(object);}
+      var obj = scene.children[i];
+      console.log(obj);
+        if (obj instanceof THREE.Mesh && obj.type == "Mesh") {
+            obj.geometry.dispose();
+            obj.geometry = null;
+            obj.material.dispose();
+            obj.material = null;
+            scene.remove( obj ),
+            obj = null;
+        }
+        else {
+            if (obj.children !== undefined) {
+                while (obj.children.length > 0) {
+                    this.clearScene(obj.children[0]);
+                    obj.remove(obj.children[0]);
+                }
+            }
+        }
     }
-}
+};
 
 function init() {
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 100, 1000 );
