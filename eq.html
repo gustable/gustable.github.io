@@ -139,10 +139,9 @@ frameLooper();
 
 function frameLooper() {
 	//renderer.autoClear = false;
+    clearScene(scene);
     var l;
     for(l=0; l<10; l++) {
-        freqData(l, analysisCtx);
-        clearScene(scene);
         setRect(l, analysisCtx);
     }
     requestAnimationFrame( frameLooper );
