@@ -146,9 +146,9 @@ function getBqFreqBands(k){
         freqBands[k] = 31.25; } 
     else {
         freqBands[k] = freqBands[k-1] * 2; }   
-    }
-    console.log(freqBands[k]); // log frequency bands
-    return freqBands[k];
+    var freq = freqBands[k];
+    console.log(freq); // log frequency bands
+    return freq;
 }
 
 function setBqFreqBand(f){
