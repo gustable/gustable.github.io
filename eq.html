@@ -37,7 +37,7 @@ var document;
 var audio = new Audio();
 
 // Establish all variables that your Analyser will use
-var source, context, analyser, analysisCtx;
+var source, mainContext, filterCtx, analyser, analysisCtx, bandFilter, freqBands;
 
 scene = new THREE.Scene();
 
@@ -48,23 +48,121 @@ function audioElement(){
     audio.loop = true;
     audio.autoplay = true;
 
-    context = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = context.createAnalyser(); // AnalyserNode method
-    analyser.fftSize = 256;
+    mainContext = new (window.AudioContext || window.webkitAudioContext)();
+    filterCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    bandFilter = filterCtx.createBiquadFilter(); // BiquadFilterNode
+    analyser = filterCtx.createAnalyser(); // AnalyserNode 
+    analyser.fftSize = 256; //or 32768
+
+    bufferDriver = mainContext.createBuffer(2, 1024, 44100);
+    gainDriver = mainContext.createGain();
 
     // Re-route audio playback into the processing graph of the AudioContext
-    source = context.createMediaElementSource(audio); 
-    source.connect(analyser);
-    analyser.connect(context.destination);
-    return analyser;
+    source = mainContext.createMediaElementSource(audio);
+
+    source0 = source;  //USE REG EXP TO ITERATE THROUGHT THIS
+    bandFilter0 = bandFilter;
+    source0.connect(bandFilter0);
+    setBqFreqBand(9);
+    analyser0 = analyser;
+    bandFilter0.connect(analyser0);
+
+    source1 = source;
+    bandFilter1 = bandFilter;
+    source1.connect(bandFilter1);
+    setBqFreqBand(8);
+    analyser1 = analyser;
+    bandFilter1.connect(analyser1);
+
+    source2 = source;
+    bandFilter2 = bandFilter;
+    source2.connect(bandFilter2);
+    setBqFreqBand(7);
+    analyser2 = analyser;
+    bandFilter2.connect(analyser2);
+
+    source3 = source;
+    bandFilter3 = bandFilter;
+    source3.connect(bandFilter3);
+    setBqFreqBand(6);
+    analyser3 = analyser;
+    bandFilter3.connect(analyser3);
+
+    source4 = source;
+    bandFilter4 = bandFilter;
+    source4.connect(bandFilter4);
+    setBqFreqBand(5);
+    analyser4 = analyser;
+    bandFilter4.connect(analyser4);
+
+    source5 = source;
+    bandFilter5 = bandFilter;
+    source5.connect(bandFilter5);
+    setBqFreqBand(4);
+    analyser5 = analyser;
+    bandFilter5.connect(analyser5);
+
+    source6 = source;
+    bandFilter6 = bandFilter;
+    source6.connect(bandFilter6);
+    setBqFreqBand(3);
+    analyser6 = analyser;
+    bandFilter6.connect(analyser6);
+
+    source7 = source;
+    bandFilter7 = bandFilter;
+    source7.connect(bandFilter7);
+    setBqFreqBand(2);
+    analyser7 = analyser;
+    bandFilter7.connect(analyser7);
+
+    source8 = source;
+    bandFilter8 = bandFilter;
+    source8.connect(bandFilter8);
+    setBqFreqBand(1);
+    analyser8 = analyser;
+    bandFilter8.connect(analyser8);
+
+    source9 = source;
+    bandFilter9 = bandFilter;
+    source9.connect(bandFilter9);
+    setBqFreqBand(0);
+    analyser9 = analyser;
+    bandFilter9.connect(analyser9);
+
+    source.connect(bufferDriver);
+    bufferDriver.connect(gainDriver);
+    gainDriver.connect(mainContext.destination);
+    gainDriver.gain.setValueAtTime(0.667, mainContext.currentTime);
+    //return analyser;
 }
 
-function freqData(m, aCtx){
+function getBqFreqBands(k){
+    // Set the number of frequency bands for the EQ
+    var freqBands = new Float32Array(10);
+    //freqBands[0] = 0;  //Placeholder for ease of iteration above
+    if (k == 0) {
+        freqBands[k] = 31.25; } 
+    else {
+        freqBands[k] = freqBands[k-1] * 2; }   
+    }
+    console.log(freqBands[k]); // log frequency bands
+    return freqBands[k];
+}
+
+function setBqFreqBand(f){
+    bandFilter.type = "bandpass";
+    bandFilter.frequency.value = getBqFreqBands(f);
+    bandFilter.Q.value = 29.7;
+}
+
+function freqData(m, aCtx){ 
     var bufferLength = aCtx.frequencyBinCount;
-    var dataArray = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(dataArray);
-    var v = dataArray[m];
-    console.log(v*0.1);
+    var dataArray = new Float32Array(bufferLength);
+    ('analyser' + m).getFloatFrequencyData(dataArray);
+    var v = sum(dataArray[:]) / (bufferLength * 2);
+    console.log(v*0.25);
     return v;
 }
 
@@ -79,15 +177,15 @@ function setRect(n, analCtx){
 }
 
 function clearScene(scene) {
-    var i;
-    for (i = scene.children.length - 1; i >= 0; i--) {
-        var obj = scene.children[i];
+    var j;
+    for (j = scene.children.length - 1; j >= 0; j--) {
+        var obj = scene.children[j];
         if (obj instanceof THREE.Mesh && obj.type == "Mesh") {
             obj.geometry.dispose();
             obj.geometry = null;
             obj.material.dispose();
             obj.material = null;
-            scene.remove( obj ),
+            scene.remove( obj );
             obj = null;
         }
         else {
@@ -109,16 +207,16 @@ function init() {
     listener = new THREE.AudioListener();
     camera.add( listener );
 
-    analysisCtx = audioElement();
+    //analysisCtx = audioElement();
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     // show cubes in an array
-    var j;
-    for(j=0; j<10; j++) {
-        setRect(j, analysisCtx);
-        console.log(j)
+    var i;
+    for(i=0; i<10; i++) {
+        setRect(i, filterCtx);
+        console.log(i);
     }
 
     // show axes in the screen
@@ -138,7 +236,7 @@ renderer.render(scene, camera);
 frameLooper();
 
 function frameLooper() {
-	//renderer.autoClear = false;
+    //renderer.autoClear = false;
     clearScene(scene);
     var l;
     for(l=0; l<10; l++) {
@@ -151,7 +249,6 @@ function frameLooper() {
 
 document.getElementById('audio_box').appendChild(audio);
 document.getElementById('container').appendChild(renderer.domElement);
-
 
 </script>
 
