@@ -37,7 +37,7 @@ var document;
 var audio = new Audio();
 
 // Establish all variables that your Analyser will use
-var source, mainContext, filterCtx, analyser, analysisCtx, bandFilter, freqBands;
+var source, mainContext, filterCtx, mainBuffer, mainGain, analyser, bandFilter;
 
 scene = new THREE.Scene();
 
@@ -53,90 +53,92 @@ function audioElement(){
 
     bandFilter = filterCtx.createBiquadFilter(); // BiquadFilterNode
     analyser = filterCtx.createAnalyser(); // AnalyserNode 
-    analyser.fftSize = 256; //or 32768
+    analyser.fftSize = 16384; //or 32768
 
-    bufferDriver = mainContext.createBuffer(2, 1024, 44100);
-    gainDriver = mainContext.createGain();
+    mainBuffer = mainContext.createBuffer(2, 1024, 44100);
+    mainGain = mainContext.createGain();
 
-    // Re-route audio playback into the processing graph of the AudioContext
+    //USE THE copyFromChannel() method of the AudioBuffer interface into another
+    //buffer instead of sources
     source = mainContext.createMediaElementSource(audio);
+    source.connect(mainBuffer);
 
-    source0 = source;  //USE REG EXP TO ITERATE THROUGHT THIS
-    bandFilter0 = bandFilter;
+    var source0 = clone(source);
+    var bandFilter0 = bandFilter;
     source0.connect(bandFilter0);
     setBqFreqBand(9);
-    analyser0 = analyser;
+    var analyser0 = analyser;
     bandFilter0.connect(analyser0);
 
-    source1 = source;
-    bandFilter1 = bandFilter;
+    var source1 = clone(source);
+    var bandFilter1 = bandFilter;
     source1.connect(bandFilter1);
     setBqFreqBand(8);
-    analyser1 = analyser;
+    var analyser1 = analyser;
     bandFilter1.connect(analyser1);
 
-    source2 = source;
-    bandFilter2 = bandFilter;
+    var source2 = clone(source);
+    var bandFilter2 = bandFilter;
     source2.connect(bandFilter2);
     setBqFreqBand(7);
-    analyser2 = analyser;
+    var analyser2 = analyser;
     bandFilter2.connect(analyser2);
 
-    source3 = source;
-    bandFilter3 = bandFilter;
+    var source3 = clone(source);
+    var bandFilter3 = bandFilter;
     source3.connect(bandFilter3);
     setBqFreqBand(6);
-    analyser3 = analyser;
+    var analyser3 = analyser;
     bandFilter3.connect(analyser3);
 
-    source4 = source;
-    bandFilter4 = bandFilter;
+    var source4 = clone(source);
+    var bandFilter4 = bandFilter;
     source4.connect(bandFilter4);
     setBqFreqBand(5);
-    analyser4 = analyser;
+    var analyser4 = analyser;
     bandFilter4.connect(analyser4);
 
-    source5 = source;
-    bandFilter5 = bandFilter;
+    var source5 = clone(source);
+    var bandFilter5 = bandFilter;
     source5.connect(bandFilter5);
     setBqFreqBand(4);
-    analyser5 = analyser;
+    var analyser5 = analyser;
     bandFilter5.connect(analyser5);
 
-    source6 = source;
-    bandFilter6 = bandFilter;
+    var source6 = clone(source);
+    var bandFilter6 = bandFilter;
     source6.connect(bandFilter6);
     setBqFreqBand(3);
-    analyser6 = analyser;
+    var analyser6 = analyser;
     bandFilter6.connect(analyser6);
 
-    source7 = source;
-    bandFilter7 = bandFilter;
+    var source7 = clone(source);
+    var bandFilter7 = bandFilter;
     source7.connect(bandFilter7);
     setBqFreqBand(2);
-    analyser7 = analyser;
+    var analyser7 = analyser;
     bandFilter7.connect(analyser7);
 
-    source8 = source;
-    bandFilter8 = bandFilter;
+    var source8 = clone(source);
+    var bandFilter8 = bandFilter;
     source8.connect(bandFilter8);
     setBqFreqBand(1);
-    analyser8 = analyser;
+    var analyser8 = analyser;
     bandFilter8.connect(analyser8);
 
-    source9 = source;
-    bandFilter9 = bandFilter;
+    var source9 = clone(source);
+    var bandFilter9 = bandFilter;
     source9.connect(bandFilter9);
     setBqFreqBand(0);
-    analyser9 = analyser;
+    var analyser9 = analyser;
     bandFilter9.connect(analyser9);
 
-    source.connect(bufferDriver);
-    bufferDriver.connect(gainDriver);
-    gainDriver.connect(mainContext.destination);
-    gainDriver.gain.setValueAtTime(0.667, mainContext.currentTime);
+    mainBuffer.connect(mainGain);
+    mainGain.connect(mainContext.destination);
+    mainGain.gain.setValueAtTime(0.667, mainContext.currentTime);
     //return analyser;
 }
+
 
 function getBqFreqBands(k){
     // Set the number of frequency bands for the EQ
@@ -145,7 +147,7 @@ function getBqFreqBands(k){
     if (k == 0) {
         freqBands[k] = 31.25; } 
     else {
-        freqBands[k] = freqBands[k-1] * 2; }   
+        freqBands[k] = freqBands[k-1] * 2; }
     var freq = freqBands[k];
     console.log(freq); // log frequency bands
     return freq;
@@ -161,8 +163,8 @@ function freqData(m, aCtx){
     var bufferLength = aCtx.frequencyBinCount;
     var dataArray = new Float32Array(bufferLength);
     ('analyser' + m).getFloatFrequencyData(dataArray);
-    var v = sum(dataArray[:]) / (bufferLength * 2);
-    console.log(v*0.25);
+    var v = ( dataArray.reduce(function(acc, val) { return acc + val; }, 0) ) / 2;
+    console.log(v*0.1);
     return v;
 }
 
@@ -207,7 +209,7 @@ function init() {
     listener = new THREE.AudioListener();
     camera.add( listener );
 
-    //analysisCtx = audioElement();
+    audioElement();
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -249,6 +251,7 @@ function frameLooper() {
 
 document.getElementById('audio_box').appendChild(audio);
 document.getElementById('container').appendChild(renderer.domElement);
+
 
 </script>
 
