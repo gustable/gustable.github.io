@@ -232,11 +232,6 @@ function init() {
     controls.rotateSpeed = 4;
 }
 
-init();
-controls.update();
-renderer.render(scene, camera);
-frameLooper();
-
 function frameLooper() {
     //renderer.autoClear = false;
     clearScene(scene);
@@ -248,6 +243,11 @@ function frameLooper() {
     controls.update();
     renderer.render( scene, camera );
 }
+
+init();
+controls.update();
+renderer.render(scene, camera);
+frameLooper();
 
 document.getElementById('audio_box').appendChild(audio);
 document.getElementById('container').appendChild(renderer.domElement);
