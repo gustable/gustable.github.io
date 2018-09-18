@@ -29,7 +29,6 @@
 
 <script type="text/javascript">
 /*** base Graphic EQ code by srchea ***/
-
 var camera, scene, renderer;
 var controls;
 var listener;
@@ -55,7 +54,7 @@ function audioElement(){
     analyser = filterCtx.createAnalyser(); // AnalyserNode 
     analyser.fftSize = 16384; //or 32768
 
-    mainBuffer = mainContext.createBuffer(2, mainContext.sampleRate * 3, mainContext.sampleRate);
+    mainBuffer = mainContext.createBuffer(2, mainContext.sampleRate * 2.221, mainContext.sampleRate);
     mainGain = mainContext.createGain();
 
     //USE THE copyFromChannel() method of the AudioBuffer interface into another
@@ -63,7 +62,7 @@ function audioElement(){
     //source = mainContext.createMediaElementSource(audio);
     source = mainContext.createBufferSource();
     source.buffer = mainBuffer;
-    source.connect(mainContext.destination);
+    //source.connect(mainContext.destination);
 
     var source0 = clone(source);
     var bandFilter0 = bandFilter;
