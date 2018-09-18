@@ -63,7 +63,7 @@ function audioElement(){
     //source = mainContext.createMediaElementSource(audio);
     source = mainContext.createBufferSource();
     source.buffer = mainBuffer;
-    source.connect(mainContext);
+    source.connect(mainContext.destination);
 
     var source0 = clone(source);
     var bandFilter0 = bandFilter;
