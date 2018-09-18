@@ -42,7 +42,8 @@ scene = new THREE.Scene();
 
 function audioElement(){
     // Create a new instance of an audio object and adjust some of its properties
-    audio.src = "docs/00 - Cut Your Hair.mp3";
+    audio.src = "https://youtu.be/8GqGNmcjWDY";
+    //audio.src = "docs/00 - Cut Your Hair.mp3";
     audio.controls = true;
     audio.loop = true;
     audio.autoplay = true;
@@ -59,10 +60,16 @@ function audioElement(){
 
     //USE THE copyFromChannel() method of the AudioBuffer interface into another
     //buffer instead of sources
-    //source = mainContext.createMediaElementSource(audio);
-    source = mainContext.createBufferSource();
-    source.buffer = mainBuffer;
+    source = mainContext.createMediaElementSource(audio);
+    sourceB = mainContext.createBufferSource();
+    sourceB.buffer = mainBuffer;
     //source.connect(mainContext.destination);
+
+    //Merge the two channels into one for graphic EQ processing
+    merger = mainContext.createChannelMerger(2);
+    source.connect(merger);
+
+
 
     var source0 = clone(source);
     var bandFilter0 = bandFilter;
