@@ -63,7 +63,7 @@ function audioElement(){
     //source = mainContext.createMediaElementSource(audio);
     source = mainContext.createBufferSource();
     source.buffer = mainBuffer;
-    source.connect(mainBuffer);
+    source.connect(mainContext);
 
     var source0 = clone(source);
     var bandFilter0 = bandFilter;
@@ -137,7 +137,7 @@ function audioElement(){
 
     mainBuffer.connect(mainGain);
     mainGain.connect(mainContext.destination);
-    mainGain.gain.setValueAtTime(0.667, mainContext.currentTime);
+    mainGain.gain.setValueAtTime(0.333, mainContext.currentTime);
     //return analyser;
 }
 
