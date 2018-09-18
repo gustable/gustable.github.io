@@ -55,12 +55,14 @@ function audioElement(){
     analyser = filterCtx.createAnalyser(); // AnalyserNode 
     analyser.fftSize = 16384; //or 32768
 
-    mainBuffer = mainContext.createBuffer(2, 1024, 44100);
+    mainBuffer = mainContext.createBuffer(2, mainContext.sampleRate * 3, mainContext.sampleRate);
     mainGain = mainContext.createGain();
 
     //USE THE copyFromChannel() method of the AudioBuffer interface into another
     //buffer instead of sources
-    source = mainContext.createMediaElementSource(audio);
+    //source = mainContext.createMediaElementSource(audio);
+    source = mainContext.createBufferSource();
+    source.buffer = mainBuffer;
     source.connect(mainBuffer);
 
     var source0 = clone(source);
